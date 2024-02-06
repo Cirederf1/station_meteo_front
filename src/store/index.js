@@ -1,9 +1,14 @@
 import { createStore } from "vuex";
 
 export default createStore({
-  state: {},
+  state: {
+    count: 0,
+  },
   getters: {},
-  mutations: {},
+  mutations: {
+    increment: (state) => state.count++,
+    decrement: (state) => state.count--,
+  },
   actions: {},
   modules: {},
 });
