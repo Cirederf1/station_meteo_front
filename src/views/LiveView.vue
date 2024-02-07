@@ -1,29 +1,33 @@
 <template>
   <div>
-    <h1>This is a test page</h1>
-    <h1>Counter: {{ count }}</h1>
+    <!-- <h1>This is a test page</h1>
     <button @click="increment">Increment</button>
-    <button @click="decrement">Decrement</button>
+    <button @click="decrement">Decrement</button> -->
+    <h1>Counter: {{ count }}</h1>
+    <LiveData />
+
     <l-map
+      v-if="coords"
       style="height: 300px"
       ref="map"
       v-model:zoom="zoom"
-      :center="[47.41322, -1.219482]"
+      :center="coords"
     >
       <l-tile-layer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         layer-type="base"
         name="OpenStreetMap"
       ></l-tile-layer>
+
+      <l-marker v-if="coords" :lat-lng="coords"></l-marker>
     </l-map>
-    <LiveData />
   </div>
 </template>
 
 <script>
 import store from "@/store";
 import "leaflet/dist/leaflet.css";
-import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet";
+import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
 import LiveData from "@/components/liveData.vue";
 
 export default {
@@ -31,6 +35,7 @@ export default {
   components: {
     LMap,
     LTileLayer,
+    LMarker,
     LiveData,
   },
   data() {
@@ -39,18 +44,11 @@ export default {
     };
   },
   computed: {
-    count() {
-      return store.state.count;
+    coords() {
+      return store.state.coords;
     },
   },
-  methods: {
-    increment() {
-      store.commit("increment");
-    },
-    decrement() {
-      store.commit("decrement");
-    },
-  },
+  methods: {},
 };
 </script>
 

@@ -2,12 +2,27 @@ import { createStore } from "vuex";
 
 export default createStore({
   state: {
-    count: 0,
+    coords: null,
+    startDate: "",
+    endDate: "",
+    integerValue: 1,
+    timeFormat: "hour",
   },
   getters: {},
   mutations: {
-    increment: (state) => state.count++,
-    decrement: (state) => state.count--,
+    setCoords: (state, coords) => (state.coords = coords),
+    setStartDate(state, startDate) {
+      state.startDate = startDate;
+    },
+    setEndDate(state, endDate) {
+      state.endDate = endDate;
+    },
+    setIntegerValue(state, integerValue) {
+      state.integerValue = integerValue;
+    },
+    setTimeFormat(state, timeFormat) {
+      state.timeFormat = timeFormat;
+    },
   },
   actions: {},
   modules: {},
