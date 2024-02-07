@@ -5,7 +5,7 @@
     <p>Status: {{ status ? "On" : "Off" }}</p>
     <p>Pression: {{ measurements.pressure }}</p>
     <p>Temperature: {{ measurements.temperature }}</p>
-    <p>Date: {{ location.date }}</p>
+    <p>Date: {{ measurements.date }}</p>
     <p>Rain: {{ measurements.rain }}</p>
     <p v-if="measurements.humidity">Humidity: {{ measurements.humidity }}</p>
     <p v-if="measurements.light">Light: {{ measurements.light }}</p>
@@ -13,7 +13,6 @@
     <p v-if="measurements.wind">
       Wind direction: {{ measurements.wind.direction }}
     </p>
-
     <input type="checkbox" v-model="ptdrData" @change="fetchData" />
     <label for="ptdrData">PTDR Only</label>
   </div>
@@ -27,11 +26,12 @@ export default {
       location: { date: null, coords: null },
       status: null,
       measurements: {
-        rain: null,
+        pressure: null,
         temperature: null,
+        date: null,
+        rain: null,
         light: null,
         humidity: null,
-        pressure: null,
         wind: { speed: null, direction: null },
       },
       ptdrData: false,
@@ -51,6 +51,8 @@ export default {
     async fetchLiveData() {
       try {
         // const response = await fetch("http://172.31.58.203:3000/live");
+
+        // const response = await fetch("http://172.31.43.125:3001/live");
         const response = await fetch("live.json");
 
         console.log("response", response);

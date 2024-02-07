@@ -8,24 +8,25 @@
     <input type="number" v-model="integerValue" min="0" />
 
     <select v-model="timeFormat">
-      <option value="hour">Hours</option>
-      <option value="day">Days</option>
-      <option value="week">Weeks</option>
-      <option value="month">Months</option>
-      <option value="year">Years</option>
+      <option value="s">Seconds</option>
+      <option value="m">Minutes</option>
+      <option value="h">Hours</option>
+      <option value="D">Days</option>
+      <option value="M">Months</option>
+      <option value="Y">Years</option>
     </select>
 
-    <LiveData v-if="selectionValidated" />
+    <ArchiveData />
   </div>
 </template>
 
 <script>
 import store from "@/store";
-import LiveData from "@/components/liveData.vue";
+import ArchiveData from "@/components/ArchiveData.vue";
 export default {
   store: store,
   components: {
-    LiveData,
+    ArchiveData,
   },
   computed: {
     startDate: {

@@ -2,8 +2,8 @@
   <div>
     <!-- <h1>This is a test page</h1>
     <button @click="increment">Increment</button>
-    <button @click="decrement">Decrement</button> -->
-    <h1>Counter: {{ count }}</h1>
+    <button @click="decrement">Decrement</button>
+    <h1>Counter: {{ count }}</h1> -->
     <LiveData />
 
     <l-map

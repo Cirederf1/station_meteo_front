@@ -6,7 +6,7 @@ export default createStore({
     startDate: "",
     endDate: "",
     integerValue: 1,
-    timeFormat: "hour",
+    timeFormat: "h",
   },
   getters: {},
   mutations: {
