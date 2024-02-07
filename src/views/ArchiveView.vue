@@ -74,10 +74,6 @@ export default {
       const today = new Date();
       return today.toISOString().split("T")[0];
     },
-    selectionValidated() {
-      if (store.state.startDate != "" && store.state.endDate != "") return true;
-      else return false;
-    },
   },
   methods: {
     validateSelection() {
