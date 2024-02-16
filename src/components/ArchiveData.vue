@@ -1,6 +1,14 @@
 <template>
   <div>
-    <button @click="click">Fetch data</button>
+    <div>
+      <input type="text" v-model="search" @keyup.enter="addStation" />
+      <button @click="addStation">Add station</button>
+      <select v-model="selectedStation">
+        <option v-for="station in stations" :key="station.id" :value="station">
+          {{ station.name }}
+        </option>
+      </select>
+    </div>
 
     <div>
       <p>Station name: {{ name }}</p>
@@ -55,6 +63,7 @@ export default {
   store: store,
   data() {
     return {
+      search: "172.31.58.203",
       name: null,
       location: { date: null, coords: null },
       status: null,
@@ -74,6 +83,8 @@ export default {
       showHumidity: false,
       showLight: false,
       showWind: false,
+      stations: [],
+      selectedStation: null,
     };
   },
   computed: {
@@ -81,31 +92,42 @@ export default {
       if (store.state.startDate != "" && store.state.endDate != "") return true;
       else return false;
     },
+    server() {
+      return this.search;
+    },
   },
   methods: {
-    async click() {
+    async addStation() {
       this.fetchData(
+        this.server,
         store.state.startDate,
         store.state.endDate,
         store.state.integerValue + store.state.timeFormat
       );
     },
-    async fetchData(from, to, interval) {
+    async fetchData(server, from, to, interval) {
       if (store.state.startDate != "") {
-        await this.fetchArchiveData(from, to, interval);
+        await this.fetchArchiveData(server, from, to, interval);
       }
     },
-    async fetchArchiveData(from, to = "null", interval, filter = "") {
+    async fetchArchiveData(
+      server,
+      from,
+      to = "null",
+      interval /*filter = ""*/
+    ) {
       try {
         const response = await fetch(
-          "http://172.31.58.203:3000/archive?from=" +
+          "http://" +
+            server +
+            ":80/archive?from=" +
             from +
             "&to=" +
             to +
             "&interval=" +
-            interval +
-            "&filter=" +
-            filter
+            interval //+
+          // "&filter=" +
+          // filter
         );
         const data = await response.json();
         console.log("data", data);

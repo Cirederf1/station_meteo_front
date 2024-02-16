@@ -11,7 +11,7 @@
       <option value="s">Seconds</option>
       <option value="m">Minutes</option>
       <option value="h">Hours</option>
-      <option value="D">Days</option>
+      <option value="d">Days</option>
       <option value="M">Months</option>
       <option value="Y">Years</option>
     </select>

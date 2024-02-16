@@ -21,10 +21,8 @@
     <p>Rain: {{ measurements.rain }}</p>
     <p v-if="measurements.humidity">Humidity: {{ measurements.humidity }}</p>
     <p v-if="measurements.light">Light: {{ measurements.light }} lux</p>
-    <p v-if="measurements.wind.speed">
-      Wind speed: {{ measurements.wind.speed }}
-    </p>
-    <p v-if="measurements.wind.direction">
+    <p v-if="measurements.wind">Wind speed: {{ measurements.wind.speed }}</p>
+    <p v-if="measurements.wind">
       Wind direction: {{ measurements.wind.direction }}
     </p>
   </div>
@@ -54,7 +52,7 @@ export default {
   },
   computed: {
     server() {
-      return "http://" + this.search + ":80";
+      return "http://" + this.search + ":3000";
     },
   },
   methods: {
