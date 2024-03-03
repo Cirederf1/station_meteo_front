@@ -1,16 +1,21 @@
 <template>
   <div>
+    <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
     <input type="text" v-model="search" @keyup.enter="addStation" />
     <button @click="addStation">Add station</button>
-    <select v-model="selectedStation">
-      <option v-for="station in stations" :key="station.id" :value="station">
-        {{ station.name }}
+    <select v-model="selectedStation" @change="changeSelectedStation">
+      <option
+        v-for="station in stations"
+        :key="station.name"
+        :value="station.address"
+      >
+        {{ station.address }}
       </option>
     </select>
   </div>
 
   <div>
-    <input type="checkbox" v-model="ptdrData" @change="click" />
+    <input type="checkbox" v-model="ptdrData" />
     <label for="ptdrData">PTDR Only</label>
     <p>Station name: {{ name }}</p>
     <p>Location: {{ location.coords }}</p>
@@ -29,7 +34,10 @@
 </template>
 
 <script>
+import store from "@/store";
+
 export default {
+  store: store,
   data() {
     return {
       search: "",
@@ -46,27 +54,53 @@ export default {
         wind: { speed: null, direction: null },
       },
       ptdrData: false,
-      stations: [],
-      selectedStation: null,
+      errorMessage: null,
     };
   },
   computed: {
     server() {
-      return "http://" + this.search + ":3000";
+      // return "http://" + this.search + ":3000";
+      return this.search;
+    },
+    stations() {
+      return this.$store.state.stations;
+    },
+    selectedStation: {
+      get() {
+        return this.$store.state.selectedStation;
+      },
+      set(value) {
+        this.$store.commit("setSelectedStation", value);
+      },
     },
   },
   methods: {
-    checkStation(data) {
-      if (!this.stations.find((station) => station.name === this.name)) {
-        this.stations.push({
-          id: this.stations.length + 1,
-          name: this.name,
-          coords: data.location.coords,
-        });
+    addStation() {
+      if (!this.stations.find((station) => station.address === this.server)) {
+        this.fetchData(this.server);
       }
     },
-    addStation() {
-      this.fetchData(this.server);
+    checkStation(data) {
+      let stationsList;
+      if (this.$store.state.stations) {
+        stationsList = this.stations;
+      } else {
+        stationsList = [];
+      }
+      if (!stationsList.find((station) => station.name === this.name)) {
+        stationsList.push({
+          id: stationsList.length + 1,
+          name: this.name,
+          address: this.server,
+          coords: data.location.coords,
+        });
+        this.$store.commit("setStations", stationsList);
+        this.$store.commit("setSelectedStation", this.server);
+      }
+    },
+    changeSelectedStation() {
+      this.fetchData(this.selectedStation);
+      this.$store.commit("setSelectedStation", this.selectedStation);
     },
     async fetchData(server) {
       if (this.ptdrData) {
@@ -77,37 +111,38 @@ export default {
     },
     async fetchLiveData(server) {
       try {
-        // const response = await fetch("http://172.31.58.203:3000/live");
-
-        // const response = await fetch("http://172.31.43.125:3001/live");
-        const response = await fetch(server + "/live");
+        const response = await fetch(server + ".json");
+        // const response = await fetch(server + "/live");
         const data = await response.json();
-        // console.log("data", data);
+
         this.name = data.name;
         this.location = data.location;
         this.status = data.status;
         this.measurements = data.measurements;
         this.$store.commit("setCoords", data.location.coords);
         this.checkStation(data);
+        this.errorMessage = null;
       } catch (error) {
         console.error("Error fetching live data:", error);
+        this.errorMessage = "Station not found";
       }
     },
     async fetchLiveDataPTDR(server) {
       try {
-        // const response = await fetch("http://172.31.58.203:3000/live?ptdr");
-        const response = await fetch(server + "/live?ptdr");
+        const response = await fetch(server + "PTDR.json");
+        // const response = await fetch(server + "/live?ptdr");
 
         const data = await response.json();
-        // console.log("data", data);
         this.name = data.name;
         this.location = data.location;
         this.status = data.status;
         this.measurements = data.measurements;
         this.$store.commit("setCoords", data.location.coords);
-        this.stations.push({ id: this.stations.length + 1, name: this.name });
+        this.checkStation(data);
+        this.errorMessage = null;
       } catch (error) {
         console.error("Error fetching PTDR live data:", error);
+        this.errorMessage = "Station not found";
       }
     },
   },

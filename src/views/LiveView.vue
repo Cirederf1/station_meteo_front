@@ -1,14 +1,11 @@
 <template>
-  <div>
-    <!-- <h1>This is a test page</h1>
-    <button @click="increment">Increment</button>
-    <button @click="decrement">Decrement</button>
-    <h1>Counter: {{ count }}</h1> -->
-    <LiveData />
-
+  <div class="container">
+    <div>
+      <LiveData />
+    </div>
     <l-map
       v-if="coords"
-      style="height: 300px"
+      style="height: 400px; width: 50%"
       ref="map"
       v-model:zoom="zoom"
       :center="coords"
@@ -23,6 +20,13 @@
     </l-map>
   </div>
 </template>
+
+<style scoped>
+.container {
+  display: flex;
+  justify-content: space-around;
+}
+</style>
 
 <script>
 import store from "@/store";
@@ -46,6 +50,14 @@ export default {
   computed: {
     coords() {
       return store.state.coords;
+    },
+    selectedStation() {
+      return this.$store.state.selectedStation;
+    },
+  },
+  watch: {
+    selectedStation() {
+      this.zoom = 13;
     },
   },
   methods: {},

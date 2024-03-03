@@ -7,6 +7,8 @@ export default createStore({
     endDate: "",
     integerValue: 1,
     timeFormat: "h",
+    stations: [],
+    selectedStation: null,
   },
   getters: {},
   mutations: {
@@ -22,6 +24,12 @@ export default createStore({
     },
     setTimeFormat(state, timeFormat) {
       state.timeFormat = timeFormat;
+    },
+    setStations(state, stations) {
+      state.stations = stations;
+    },
+    setSelectedStation(state, selectedStation) {
+      state.selectedStation = selectedStation;
     },
   },
   actions: {},
