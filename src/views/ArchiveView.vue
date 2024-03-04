@@ -1,24 +1,35 @@
 <template>
-  <div>
-    <h1>Choix des dates</h1>
-    <input type="date" v-model="startDate" :max="maxDate" :min="minDate" />
-    <input type="date" v-model="endDate" :max="maxDate" :min="minDate" />
+  <div class="container">
+    <div>
+      <p>Choix des dates</p>
+      <input type="date" v-model="startDate" :max="maxDate" :min="minDate" />
+      <input type="date" v-model="endDate" :max="maxDate" :min="minDate" />
 
-    <h1>Choix de l'interval</h1>
-    <input type="number" v-model="integerValue" min="0" />
+      <p>Choix de l'interval</p>
+      <input type="number" v-model="integerValue" min="0" />
 
-    <select v-model="timeFormat">
-      <option value="s">Seconds</option>
-      <option value="m">Minutes</option>
-      <option value="h">Hours</option>
-      <option value="d">Days</option>
-      <option value="M">Months</option>
-      <option value="Y">Years</option>
-    </select>
-
-    <ArchiveData />
+      <select v-model="timeFormat">
+        <option value="s">Seconds</option>
+        <option value="m">Minutes</option>
+        <option value="h">Hours</option>
+        <option value="D">Days</option>
+        <option value="M">Months</option>
+        <option value="Y">Years</option>
+      </select>
+    </div>
+    <div>
+      <ArchiveData />
+    </div>
   </div>
 </template>
+
+<style scoped>
+.container {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+}
+</style>
 
 <script>
 import store from "@/store";
@@ -27,6 +38,11 @@ export default {
   store: store,
   components: {
     ArchiveData,
+  },
+  created() {
+    const today = new Date();
+    const formattedToday = today.toISOString().split("T")[0];
+    store.commit("setStartDate", formattedToday);
   },
   computed: {
     startDate: {

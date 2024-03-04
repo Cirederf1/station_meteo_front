@@ -1,6 +1,7 @@
 <template>
   <div>
     <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+    <p>Choix de la station</p>
     <input type="text" v-model="search" @keyup.enter="addStation" />
     <button @click="addStation">Add station</button>
     <select v-model="selectedStation" @change="changeSelectedStation">
@@ -21,14 +22,16 @@
     <p>Location: {{ location.coords }}</p>
     <p>Status: {{ status ? "On" : "Off" }}</p>
     <p>Pression: {{ measurements.pressure }} hPa</p>
-    <p>Temperature: {{ measurements.temperature }}</p>
+    <p>Temperature: {{ measurements.temperature }} °C</p>
     <p>Date: {{ measurements.date }}</p>
-    <p>Rain: {{ measurements.rain }}</p>
-    <p v-if="measurements.humidity">Humidity: {{ measurements.humidity }}</p>
+    <p>Last Rain: {{ measurements.rain }}</p>
+    <p v-if="measurements.humidity">Humidity: {{ measurements.humidity }} %</p>
     <p v-if="measurements.light">Light: {{ measurements.light }} lux</p>
-    <p v-if="measurements.wind">Wind speed: {{ measurements.wind.speed }}</p>
     <p v-if="measurements.wind">
-      Wind direction: {{ measurements.wind.direction }}
+      Wind speed: {{ measurements.wind.speed }} m/s
+    </p>
+    <p v-if="measurements.wind">
+      Wind direction: {{ measurements.wind.direction }} °
     </p>
   </div>
 </template>
@@ -63,10 +66,15 @@ export default {
       errorMessage: null,
     };
   },
+  mounted() {
+    if (this.selectedStation) {
+      this.changeSelectedStation();
+    }
+  },
   computed: {
     server() {
-      // return "http://" + this.search + ":3000";
       return this.search;
+      // return this.search;
     },
     stations() {
       return this.$store.state.stations;
@@ -122,8 +130,8 @@ export default {
     },
     async fetchLiveData(server) {
       try {
-        const response = await fetch(server + ".json");
-        // const response = await fetch(server + "/live");
+        // const response = await fetch(server + ".json");
+        const response = await fetch("http://" + server + "/live");
         const data = await response.json();
 
         this.name = data.name;
@@ -140,8 +148,8 @@ export default {
     },
     async fetchLiveDataPTDR(server) {
       try {
-        const response = await fetch(server + "PTDR.json");
-        // const response = await fetch(server + "/live?ptdr");
+        // const response = await fetch(server + "PTDR.json");
+        const response = await fetch("http://" + server + "/live?ptdr");
 
         const data = await response.json();
         this.name = data.name;

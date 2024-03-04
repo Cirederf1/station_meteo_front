@@ -1,6 +1,7 @@
 <template>
   <div>
     <div>
+      <p>Choix de la station</p>
       <input type="text" v-model="search" @keyup.enter="addStation" />
       <button @click="addStation">Add station</button>
       <select v-model="selectedStation" @change="changeSelectedStation">
@@ -9,7 +10,7 @@
           :key="station.name"
           :value="station.address"
         >
-          {{ station.address }}
+          {{ station.name }}
         </option>
       </select>
       <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
@@ -17,55 +18,73 @@
 
     <div>
       <p>Station name: {{ name }}</p>
-      <p>Location: {{ location.coords }}</p>
       <p>Status: {{ status ? "On" : "Off" }}</p>
-      <p>Date: {{ location.date }}</p>
+
+      <table>
+        Filtre:
+        <button @click="updateGraph">Update Graph</button>
+        <tr>
+          <th>
+            <input
+              type="radio"
+              id="pressure"
+              value="Pressure"
+              v-model="selectedOption"
+            />
+            <label for="pressure">Pressure</label>
+          </th>
+          <th>
+            <input
+              type="radio"
+              id="temperature"
+              value="Temperature"
+              v-model="selectedOption"
+            />
+            <label for="temperature">Temperature</label>
+          </th>
+          <th>
+            <input
+              type="radio"
+              id="rain"
+              value="Rain"
+              v-model="selectedOption"
+            />
+            <label for="rain">Rain</label>
+          </th>
+        </tr>
+        <tr>
+          <th>
+            <input
+              type="radio"
+              id="humidity"
+              value="Humidity"
+              v-model="selectedOption"
+            />
+            <label for="humidity">Humidity</label>
+          </th>
+          <th>
+            <input
+              type="radio"
+              id="light"
+              value="Light"
+              v-model="selectedOption"
+            />
+            <label for="light">Light</label>
+          </th>
+          <th>
+            <input
+              type="radio"
+              id="wind"
+              value="Wind"
+              v-model="selectedOption"
+            />
+            <label for="wind">Wind</label>
+          </th>
+        </tr>
+      </table>
 
       <div>
-        <input type="checkbox" id="pressure" v-model="showPressure" />
-        <label for="pressure">Pressure</label>
-      </div>
-      <div>
-        <input type="checkbox" id="temperature" v-model="showTemperature" />
-        <label for="temperature">Temperature</label>
-      </div>
-      <div>
-        <input type="checkbox" id="date" v-model="showDate" />
-        <label for="date">Date</label>
-      </div>
-      <div>
-        <input type="checkbox" id="rain" v-model="showRain" />
-        <label for="rain">Rain</label>
-      </div>
-      <div>
-        <input type="checkbox" id="humidity" v-model="showHumidity" />
-        <label for="humidity">Humidity</label>
-      </div>
-      <div>
-        <input type="checkbox" id="light" v-model="showLight" />
-        <label for="light">Light</label>
-      </div>
-      <div>
-        <input type="checkbox" id="wind" v-model="showWind" />
-        <label for="wind">Wind</label>
-      </div>
-
-      <p v-if="showPressure">Pression: {{ measurements.pressure }}</p>
-      <p v-if="showTemperature">Temperature: {{ measurements.temperature }}</p>
-      <p v-if="showDate">Date: {{ measurements.date }}</p>
-      <p v-if="showRain">Rain: {{ measurements.rain }}</p>
-      <p v-if="showHumidity">Humidity: {{ measurements.humidity }}</p>
-      <p v-if="showLight">Light: {{ measurements.light }}</p>
-      <p v-if="showWind">
-        Wind speed: {{ measurements.wind ? measurements.wind.speed : "" }}
-      </p>
-      <p v-if="showWind">
-        Wind direction:
-        {{ measurements.wind ? measurements.wind.direction : "" }}
-      </p>
-
-      <div v-if="clicked">
-        <LineChart />
+        <LineChart :data="chartData" :options="chartOptions" />
       </div>
     </div>
   </div>
@@ -74,6 +93,17 @@
 <style scoped>
 .error {
   color: red;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+th {
+  padding-top: 10px;
+  text-align: left;
+}
+
+th input[type="checkbox"] {
+  margin-right: 5px;
 }
 </style>
 
@@ -81,46 +111,18 @@
 import store from "@/store";
 import LineChart from "@/components/ChartComponent.vue";
 
-export const data = {
-  labels: location.date,
-  datasets: [
-    {
-      label: "Data One",
-      backgroundColor: "#f87979",
-      data: [40, 39, 10, 40, 39, 80, 40],
-    },
-    {
-      label: "Data 2",
-      backgroundColor: "#ffffff",
-      data: [12, 12, 12, 12, 12, 12, 12],
-    },
-  ],
-};
-
-export const options = {
-  responsive: true,
-  maintainAspectRatio: false,
-};
-
 export default {
   components: { LineChart },
   store: store,
   data() {
     return {
       search: "",
-      clicked: false,
       errorMessage: null,
       name: null,
       location: { date: null, coords: null },
       status: null,
       measurements: [],
-      showPressure: false,
-      showTemperature: false,
-      showDate: false,
-      showRain: false,
-      showHumidity: false,
-      showLight: false,
-      showWind: false,
+      selectedOption: "",
       chartData: {
         labels: [],
         datasets: [],
@@ -128,6 +130,18 @@ export default {
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+          },
+          title: {
+            display: true,
+          },
+          tooltip: {
+            enabled: true,
+          },
+          backgroundColor: "#ffffff",
+        },
       },
     };
   },
@@ -150,20 +164,67 @@ export default {
         this.$store.commit("setSelectedStation", value);
       },
     },
+    integerValue: {
+      get() {
+        return store.state.integerValue;
+      },
+    },
+    timeFormat: {
+      get() {
+        return store.state.timeFormat;
+      },
+    },
+  },
+  mounted() {
+    if (this.selectedStation) {
+      this.changeSelectedStation();
+    }
+  },
+  watch: {
+    integerValue() {
+      if (this.selectedStation)
+        this.fetchData(
+          this.selectedStation,
+          store.state.startDate,
+          store.state.endDate,
+          store.state.integerValue + store.state.timeFormat
+        );
+    },
+    timeFormat() {
+      if (this.selectedStation)
+        this.fetchData(
+          this.selectedStation,
+          store.state.startDate,
+          store.state.endDate,
+          store.state.integerValue + store.state.timeFormat
+        );
+    },
+    watch: {
+      selectedStation() {
+        this.changeSelectedStation();
+      },
+    },
   },
   methods: {
     async addStation() {
+      if (!this.stations.find((station) => station.address === this.server)) {
+        this.fetchData(
+          this.server,
+          store.state.startDate,
+          store.state.endDate,
+          store.state.integerValue + store.state.timeFormat
+        );
+      }
+    },
+    changeSelectedStation() {
+      console.log(this.selectedStation);
+      this.$store.commit("setSelectedStation", this.selectedStation);
       this.fetchData(
-        this.server,
+        this.selectedStation,
         store.state.startDate,
         store.state.endDate,
         store.state.integerValue + store.state.timeFormat
       );
-      this.clicked = true;
-    },
-    changeSelectedStation() {
-      this.fetchData(this.selectedStation);
-      this.$store.commit("setSelectedStation", this.selectedStation);
     },
     checkStation(data) {
       let stationsList;
@@ -188,22 +249,19 @@ export default {
         await this.fetchArchiveData(server, from, to, interval);
       }
     },
-    async fetchArchiveData(
-      server
-      /*from , to = "", interval = "", filter = ""*/
-    ) {
+    async fetchArchiveData(server, from, to = "", interval = "", filter = "") {
       try {
-        // let lien = "http://" + server + ":80/archive?from=" + from;
-        let lien = server + "Archive.json";
-        // if (to != "") {
-        //   lien += "&to=" + to;
-        // }
-        // if (interval != "") {
-        //   lien += "&interval=" + interval;
-        // }
-        // if (filter != "") {
-        //   lien += "&filter=" + filter;
-        // }
+        let lien = "http://" + server + ":80/archive?from=" + from;
+        // let lien = server + "Archive.json";
+        if (to != "") {
+          lien += "&to=" + to;
+        }
+        if (interval != "") {
+          lien += "&interval=" + interval;
+        }
+        if (filter != "") {
+          lien += "&filter=" + filter;
+        }
         const response = await fetch(lien);
         const data = await response.json();
         console.log("data", data);
@@ -216,6 +274,49 @@ export default {
       } catch (error) {
         console.error("Error fetching live data:", error);
         this.errorMessage = "Station not found";
+      }
+    },
+    updateGraph() {
+      this.chartData = {
+        labels: this.measurements.date,
+        datasets: [],
+      };
+
+      if (this.selectedOption == "Pressure") {
+        this.chartData.datasets.push({
+          label: "Pressure (hPa)",
+          data: this.measurements.pressure,
+        });
+      }
+      if (this.selectedOption == "Temperature") {
+        this.chartData.datasets.push({
+          label: "Temperature (°C)",
+          data: this.measurements.temperature,
+        });
+      }
+      if (this.selectedOption == "Rain") {
+        this.chartData.datasets.push({
+          label: "Rain (mm / m2 / h)",
+          data: this.measurements.rain,
+        });
+      }
+      if (this.selectedOption == "Humidity") {
+        this.chartData.datasets.push({
+          label: "Humidity (%)",
+          data: this.measurements.humidity,
+        });
+      }
+      if (this.selectedOption == "Light") {
+        this.chartData.datasets.push({
+          label: "Light (lux)",
+          data: this.measurements.light,
+        });
+      }
+      if (this.selectedOption == "Wind") {
+        this.chartData.datasets.push({
+          label: "Wind Speed (m/s)",
+          data: this.measurements.wind.speed,
+        });
       }
     },
   },

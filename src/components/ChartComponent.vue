@@ -1,10 +1,18 @@
 <template>
-  <Line :data="data" :options="options" />
+  <div class="chart-container">
+    <Line :data="data" :options="options" />
+  </div>
 </template>
+
+<style scoped>
+.chart-container {
+  height: 500px;
+  background-color: gainsboro;
+}
+</style>
 
 <script>
 import { Line } from "vue-chartjs";
-import * as chartConfig from "@/components/ArchiveData.vue";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -29,8 +37,6 @@ ChartJS.register(
 export default {
   name: "LineChart",
   components: { Line },
-  data() {
-    return chartConfig;
-  },
+  props: ["data", "options"],
 };
 </script>
