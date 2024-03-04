@@ -2,6 +2,10 @@ import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
   {
+    path: "/",
+    redirect: "/live",
+  },
+  {
     path: "/live",
     name: "live",
     component: () =>
