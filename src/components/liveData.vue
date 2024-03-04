@@ -9,13 +9,13 @@
         :key="station.name"
         :value="station.address"
       >
-        {{ station.address }}
+        {{ station.name }}
       </option>
     </select>
   </div>
 
   <div>
-    <input type="checkbox" v-model="ptdrData" />
+    <input type="checkbox" v-model="ptdrData" @change="handleChange" />
     <label for="ptdrData">PTDR Only</label>
     <p>Station name: {{ name }}</p>
     <p>Location: {{ location.coords }}</p>
@@ -32,6 +32,12 @@
     </p>
   </div>
 </template>
+
+<style scoped>
+.error {
+  color: red;
+}
+</style>
 
 <script>
 import store from "@/store";
@@ -101,6 +107,11 @@ export default {
     changeSelectedStation() {
       this.fetchData(this.selectedStation);
       this.$store.commit("setSelectedStation", this.selectedStation);
+    },
+    handleChange() {
+      if (this.selectedStation) {
+        this.fetchData(this.selectedStation);
+      }
     },
     async fetchData(server) {
       if (this.ptdrData) {
